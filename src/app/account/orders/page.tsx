@@ -17,6 +17,10 @@ export default async function AccountOrdersPage({
     redirect("/login");
   }
 
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  }
+
   const { page } = await searchParams;
   const currentPage = Math.max(1, Number(page ?? "1"));
   const { orders, totalPages } = await getOrdersByUserId({

@@ -13,6 +13,10 @@ export async function POST(request: Request) {
       return jsonError("You must log in before placing an order.", 401);
     }
 
+    if (user.role === "ADMIN") {
+      return jsonError("Admins cannot place orders.", 403);
+    }
+
     const payload = checkoutSchema.safeParse(await request.json());
     if (!payload.success) {
       return jsonResponse(

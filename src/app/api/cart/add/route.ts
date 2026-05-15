@@ -20,6 +20,10 @@ export async function POST(request: Request) {
     }
 
     const user = await getCurrentUser();
+    if (user?.role === "ADMIN") {
+      return jsonError("Admins do not have a shopping cart.", 403);
+    }
+
     const cart = await addToCart({
       ...payload.data,
       userId: user?.id,

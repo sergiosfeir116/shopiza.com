@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { APP_NAME, SUPPORT_EMAIL } from "@/lib/constants";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { AppProviders } from "@/components/providers/app-providers";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
@@ -37,11 +38,14 @@ export const metadata: Metadata = {
   category: "ecommerce",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <html
       lang="en"
@@ -49,12 +53,12 @@ export default function RootLayout({
       className="h-full antialiased"
     >
       <body className="min-h-full bg-[var(--surface-subtle)] text-[var(--ink-900)]">
-        <AppProviders>
+        <AppProviders enableCart={!isAdmin}>
           <div className="relative flex min-h-screen flex-col">
-            <SiteHeader />
+            <SiteHeader user={user} />
             <main className="flex-1">{children}</main>
-            <SiteFooter supportEmail={SUPPORT_EMAIL} />
-            <WhatsAppFloat />
+            {isAdmin ? null : <SiteFooter supportEmail={SUPPORT_EMAIL} />}
+            {isAdmin ? null : <WhatsAppFloat />}
           </div>
         </AppProviders>
       </body>

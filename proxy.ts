@@ -40,7 +40,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (isAuthPath && session?.role === "ADMIN") {
+  if (session?.role === "ADMIN" && !isAdminPath) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
 

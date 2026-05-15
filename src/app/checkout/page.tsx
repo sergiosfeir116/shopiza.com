@@ -10,6 +10,10 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  }
+
   return (
     <div className="container-shell py-12">
       <CheckoutForm userName={user.fullName} />

@@ -1,7 +1,13 @@
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { getCartBySessionId } from "@/lib/services/cart";
 import { jsonError, jsonResponse } from "@/lib/http";
 
 export async function GET(request: Request) {
+  const user = await getCurrentUser();
+  if (user?.role === "ADMIN") {
+    return jsonError("Admins do not have a shopping cart.", 403);
+  }
+
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("sessionId");
 
