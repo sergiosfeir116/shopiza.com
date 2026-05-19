@@ -16,7 +16,6 @@ export function SiteFooter({ supportEmail }: { supportEmail: string }) {
           </h3>
           <div className="mt-4 flex flex-col gap-3 text-sm text-[var(--ink-700)]">
             <Link href="/products">All products</Link>
-            <Link href="/contact">Contact us</Link>
             <Link href="/account/orders">My orders</Link>
           </div>
         </div>

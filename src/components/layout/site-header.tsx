@@ -17,7 +17,6 @@ const adminNavItems = [
 const clientNavItems = [
   { href: "/", label: "Home", exact: true },
   { href: "/products", label: "Shop" },
-  { href: "/contact", label: "Contact", exact: true },
 ] as const;
 
 export function SiteHeader({ user }: { user: CurrentUser }) {
@@ -76,9 +75,6 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
             </NavLink>
             <NavLink href="/products">
               Shop
-            </NavLink>
-            <NavLink href="/contact" exact>
-              Contact
             </NavLink>
             {user ? (
               <NavLink href="/account/orders">

@@ -41,9 +41,6 @@ export default async function HomePage() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <ButtonLink href="/products">Browse products</ButtonLink>
-              <ButtonLink href="/contact" variant="secondary" className="border-white/20 bg-white/10 text-white hover:bg-white/14 hover:text-white">
-                Contact support
-              </ButtonLink>
             </div>
           </div>
         </div>
