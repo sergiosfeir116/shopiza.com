@@ -6,21 +6,13 @@ import { CartProvider } from "@/components/store/cart-provider";
 
 export function AppProviders({
   children,
-  enableCart = true,
 }: {
   children: React.ReactNode;
-  enableCart?: boolean;
 }) {
-  const content = (
-    <>
+  return (
+    <CartProvider>
       {children}
       <Toaster position="top-right" richColors />
-    </>
+    </CartProvider>
   );
-
-  if (!enableCart) {
-    return content;
-  }
-
-  return <CartProvider>{content}</CartProvider>;
 }

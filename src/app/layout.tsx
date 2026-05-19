@@ -53,7 +53,7 @@ export default async function RootLayout({
       className="h-full antialiased"
     >
       <body className="min-h-full bg-[var(--surface-subtle)] text-[var(--ink-900)]">
-        <AppProviders enableCart={!isAdmin}>
+        <AppProviders>
           <div className="relative flex min-h-screen flex-col">
             <SiteHeader user={user} />
             <main className="flex-1">{children}</main>

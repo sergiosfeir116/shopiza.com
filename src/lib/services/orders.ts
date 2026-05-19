@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type OrderStatus, type PaymentMethod } from "@prisma/client";
+import { Prisma, type OrderStatus, type PaymentMethod } from "@prisma/client";
 
 import {
   sendOrderConfirmationEmail,
@@ -221,18 +221,28 @@ export async function getOrdersByUserId(input: {
 export async function getAdminOrders(input?: {
   query?: string;
   status?: OrderStatus;
+  excludeStatus?: OrderStatus;
 }) {
+  const where: Prisma.OrderWhereInput = {
+    OR: input?.query
+      ? [
+          { orderNumber: { contains: input.query } },
+          { clientName: { contains: input.query } },
+          { clientEmail: { contains: input.query } },
+        ]
+      : undefined,
+  };
+
+  if (input?.status) {
+    where.status = input.status;
+  } else if (input?.excludeStatus) {
+    where.status = {
+      not: input.excludeStatus,
+    };
+  }
+
   return prisma.order.findMany({
-    where: {
-      status: input?.status,
-      OR: input?.query
-        ? [
-            { orderNumber: { contains: input.query } },
-            { clientName: { contains: input.query } },
-            { clientEmail: { contains: input.query } },
-          ]
-        : undefined,
-    },
+    where,
     orderBy: {
       createdAt: "desc",
     },
