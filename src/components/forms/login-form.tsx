@@ -43,7 +43,7 @@ export function LoginForm() {
         }
 
         toast.success("Welcome back.");
-        router.push(data.user?.role === "ADMIN" ? "/admin" : "/account/orders");
+        router.push(data.user?.role === "ADMIN" ? "/admin" : "/");
         router.refresh();
       }}
     >

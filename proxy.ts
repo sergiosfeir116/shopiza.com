@@ -45,7 +45,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthPath && session?.role === "CLIENT") {
-    return NextResponse.redirect(new URL("/account/orders", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
