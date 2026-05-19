@@ -225,7 +225,12 @@ export async function getAdminOrders(input?: {
   query?: string;
   status?: OrderStatus;
   excludeStatus?: OrderStatus;
+  page?: number;
+  pageSize?: number;
 }) {
+  const page = Math.max(1, input?.page ?? 1);
+  const pageSize = Math.max(1, input?.pageSize ?? 10);
+  const skip = (page - 1) * pageSize;
   const where: Prisma.OrderWhereInput = {
     OR: input?.query
       ? [
@@ -244,21 +249,32 @@ export async function getAdminOrders(input?: {
     };
   }
 
-  return prisma.order.findMany({
-    where,
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      items: true,
-      user: {
-        select: {
-          fullName: true,
-          email: true,
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: pageSize,
+      include: {
+        items: true,
+        user: {
+          select: {
+            fullName: true,
+            email: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  return {
+    orders,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }
 
 export async function getAdminUnseenOrderCount(since: Date) {

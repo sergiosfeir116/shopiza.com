@@ -2,7 +2,7 @@ import { ProductEditor } from "@/components/admin/product-editor";
 import { getAdminSections } from "@/lib/services/admin";
 
 export default async function NewProductPage() {
-  const sections = await getAdminSections();
+  const { sections } = await getAdminSections({ page: 1, pageSize: 200 });
 
   return (
     <div className="space-y-6">

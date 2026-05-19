@@ -1,6 +1,7 @@
 import { type OrderStatus } from "@prisma/client";
 
 import { OrdersManager } from "@/components/admin/orders-manager";
+import { ButtonLink } from "@/components/ui/button";
 import { getAdminOrders } from "@/lib/services/orders";
 
 const ORDER_STATUS_VALUES = [
@@ -12,6 +13,7 @@ const ORDER_STATUS_VALUES = [
 
 type AdminOrdersPageProps = {
   searchParams: Promise<{
+    page?: string;
     status?: string | string[];
   }>;
 };
@@ -37,15 +39,27 @@ function resolveStatusFilter(
 export default async function AdminOrdersPage({
   searchParams,
 }: AdminOrdersPageProps) {
-  const { status } = await searchParams;
+  const { page, status } = await searchParams;
   const statusFilter = resolveStatusFilter(status);
-  const orders = await getAdminOrders(
+  const currentPage = Math.max(1, Number(page ?? "1"));
+  const { orders, totalPages } = await getAdminOrders(
     statusFilter === "ALL"
-      ? undefined
+      ? { page: currentPage, pageSize: 5 }
       : statusFilter === "OPEN"
-        ? { excludeStatus: "DELIVERED" }
-        : { status: statusFilter },
+        ? { excludeStatus: "DELIVERED", page: currentPage, pageSize: 5 }
+        : { status: statusFilter, page: currentPage, pageSize: 5 },
   );
+
+  const buildPageHref = (nextPage: number) => {
+    const params = new URLSearchParams();
+    params.set("page", String(nextPage));
+    if (statusFilter === "ALL") {
+      params.set("status", "all");
+    } else if (statusFilter !== "OPEN") {
+      params.set("status", statusFilter);
+    }
+    return `/admin/orders?${params.toString()}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -58,6 +72,25 @@ export default async function AdminOrdersPage({
         </h1>
       </div>
       <OrdersManager orders={orders} statusFilter={statusFilter} />
+      <div className="flex items-center justify-between">
+        <ButtonLink
+          href={buildPageHref(Math.max(1, currentPage - 1))}
+          variant="secondary"
+          className={currentPage <= 1 ? "pointer-events-none opacity-50" : ""}
+        >
+          Previous
+        </ButtonLink>
+        <p className="text-sm text-[var(--ink-700)]">
+          Page {currentPage} of {totalPages}
+        </p>
+        <ButtonLink
+          href={buildPageHref(Math.min(totalPages, currentPage + 1))}
+          variant="secondary"
+          className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+        >
+          Next
+        </ButtonLink>
+      </div>
     </div>
   );
 }

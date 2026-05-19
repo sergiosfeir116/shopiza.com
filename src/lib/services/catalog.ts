@@ -209,23 +209,41 @@ export async function getAdminDashboardSnapshot() {
   };
 }
 
-export async function getAdminProducts(query?: string) {
-  const products = await prisma.product.findMany({
-    where: query
-      ? {
-          OR: [
-            { name: { contains: query } },
-            { description: { contains: query } },
-          ],
-        }
-      : undefined,
-    orderBy: {
-      updatedAt: "desc",
-    },
-    ...productCardArgs,
-  });
+export async function getAdminProducts(input?: {
+  query?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = Math.max(1, input?.page ?? 1);
+  const pageSize = Math.max(1, input?.pageSize ?? 12);
+  const skip = (page - 1) * pageSize;
+  const where = input?.query
+    ? {
+        OR: [
+          { name: { contains: input.query } },
+          { description: { contains: input.query } },
+        ],
+      }
+    : undefined;
 
-  return products.map(decorateProduct);
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      orderBy: {
+        updatedAt: "desc",
+      },
+      skip,
+      take: pageSize,
+      ...productCardArgs,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return {
+    products: products.map(decorateProduct),
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }
 
 export async function getAdminProductById(id: string) {

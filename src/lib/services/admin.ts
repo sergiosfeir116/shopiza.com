@@ -239,10 +239,57 @@ export async function deleteDiscount(id: string) {
   });
 }
 
-export async function getAdminDiscounts() {
-  return prisma.discount.findMany({
-    orderBy: {
-      createdAt: "desc",
+export async function getAdminDiscounts(input?: {
+  query?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = Math.max(1, input?.page ?? 1);
+  const pageSize = Math.max(1, input?.pageSize ?? 10);
+  const skip = (page - 1) * pageSize;
+  const where = input?.query
+    ? {
+        product: {
+          name: {
+            contains: input.query,
+          },
+        },
+      }
+    : undefined;
+
+  const [discounts, total] = await Promise.all([
+    prisma.discount.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: pageSize,
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            priceCents: true,
+            slug: true,
+          },
+        },
+      },
+    }),
+    prisma.discount.count({ where }),
+  ]);
+
+  return {
+    discounts,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
+export async function getAdminDiscountById(id: string) {
+  return prisma.discount.findUnique({
+    where: {
+      id,
     },
     include: {
       product: {
@@ -250,24 +297,92 @@ export async function getAdminDiscounts() {
           id: true,
           name: true,
           priceCents: true,
-          slug: true,
         },
       },
     },
   });
 }
 
-export async function getAdminSections() {
-  return prisma.section.findMany({
+export async function getDiscountFormProducts(currentDiscountId?: string) {
+  const discounts = await prisma.discount.findMany({
+    select: {
+      id: true,
+      productId: true,
+    },
+  });
+  const reservedProductIds = new Set(
+    discounts
+      .filter((discount) => discount.id !== currentDiscountId)
+      .map((discount) => discount.productId),
+  );
+
+  return prisma.product.findMany({
+    where: {
+      archived: false,
+      id: reservedProductIds.size
+        ? {
+            notIn: Array.from(reservedProductIds),
+          }
+        : undefined,
+    },
     orderBy: {
       name: "asc",
     },
-    include: {
-      _count: {
-        select: {
-          products: true,
+    select: {
+      id: true,
+      name: true,
+      priceCents: true,
+    },
+  });
+}
+
+export async function getAdminSections(input?: {
+  query?: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = Math.max(1, input?.page ?? 1);
+  const pageSize = Math.max(1, input?.pageSize ?? 10);
+  const skip = (page - 1) * pageSize;
+  const where = input?.query
+    ? {
+        OR: [
+          { name: { contains: input.query } },
+          { description: { contains: input.query } },
+        ],
+      }
+    : undefined;
+
+  const [sections, total] = await Promise.all([
+    prisma.section.findMany({
+      where,
+      orderBy: {
+        name: "asc",
+      },
+      skip,
+      take: pageSize,
+      include: {
+        _count: {
+          select: {
+            products: true,
+          },
         },
       },
+    }),
+    prisma.section.count({ where }),
+  ]);
+
+  return {
+    sections,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
+export async function getAdminSectionById(id: string) {
+  return prisma.section.findUnique({
+    where: {
+      id,
     },
   });
 }

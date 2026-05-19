@@ -10,9 +10,9 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [product, sections] = await Promise.all([
+  const [product, sectionsResult] = await Promise.all([
     getAdminProductById(id),
-    getAdminSections(),
+    getAdminSections({ page: 1, pageSize: 200 }),
   ]);
 
   if (!product) {
@@ -39,7 +39,7 @@ export default async function EditProductPage({
           sectionId: product.sectionId,
           images: product.images,
         }}
-        sections={sections.map((section) => ({
+        sections={sectionsResult.sections.map((section) => ({
           id: section.id,
           name: section.name,
         }))}

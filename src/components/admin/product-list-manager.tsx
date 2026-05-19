@@ -26,12 +26,16 @@ type ProductListItem = {
 export function ProductListManager({ products }: { products: ProductListItem[] }) {
   const router = useRouter();
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-end">
-        <ButtonLink href="/admin/products/new">Add product</ButtonLink>
+  if (products.length === 0) {
+    return (
+      <div className="glass-card rounded-[32px] p-8 text-center">
+        <p className="text-sm text-[var(--ink-700)]">No products found.</p>
       </div>
-      <div className="grid gap-4">
+    );
+  }
+
+  return (
+    <div className="grid gap-4">
         {products.map((product) => (
           <article key={product.id} className="glass-card rounded-[30px] p-5">
             <div className="flex flex-wrap items-start justify-between gap-5">
@@ -94,7 +98,6 @@ export function ProductListManager({ products }: { products: ProductListItem[] }
             </div>
           </article>
         ))}
-      </div>
     </div>
   );
 }

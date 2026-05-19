@@ -78,7 +78,11 @@ export const contactSchema = z.object({
 
 export const sectionSchema = z.object({
   name: z.string().min(2, "Section name is required.").max(60).transform(sanitizeText),
-  description: z.string().min(10, "Description is required.").max(240).transform(sanitizeText),
+  description: z
+    .string()
+    .min(10, "Description is required.")
+    .max(240, "Description is too long.")
+    .transform(sanitizeText),
 });
 
 export const productImageSchema = z.object({
