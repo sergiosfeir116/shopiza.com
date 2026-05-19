@@ -55,25 +55,25 @@ export function RegisterForm() {
     >
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <TextField label="Full name" name="fullName" placeholder="Your name" />
+          <TextField label="Full name" name="fullName" />
           {errors.fullName ? (
             <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.fullName[0]}</p>
           ) : null}
         </div>
         <div>
-          <TextField label="Username" name="username" placeholder="your_username" />
+          <TextField label="Username" name="username" />
           {errors.username ? (
             <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.username[0]}</p>
           ) : null}
         </div>
         <div>
-          <TextField label="Email" name="email" type="email" placeholder="you@example.com" />
+          <TextField label="Email" name="email" type="email" />
           {errors.email ? (
             <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.email[0]}</p>
           ) : null}
         </div>
         <div>
-          <TextField label="Phone number" name="phoneNumber" placeholder="+961..." />
+          <TextField label="Phone number" name="phoneNumber" />
           {errors.phoneNumber ? (
             <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.phoneNumber[0]}</p>
           ) : null}

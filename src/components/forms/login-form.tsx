@@ -51,7 +51,6 @@ export function LoginForm() {
         <TextField
           label="Email or username"
           name="identifier"
-          placeholder="admin or you@example.com"
         />
         {errors.identifier ? (
           <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.identifier[0]}</p>

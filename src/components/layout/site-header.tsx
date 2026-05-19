@@ -9,23 +9,36 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
   if (user?.role === "ADMIN") {
     return (
       <header className="sticky top-0 z-40 border-b border-white/50 bg-[rgba(245,247,251,0.72)] backdrop-blur-xl">
-        <div className="container-shell flex items-center justify-between gap-6 py-4">
-          <div className="flex items-center gap-8">
+        <div className="container-shell grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4">
+          <div className="flex items-center">
             <ShopizaLogo href="/admin" />
-            <nav className="hidden items-center gap-6 text-sm font-medium text-[var(--ink-700)] md:flex">
-              <NavLink href="/admin">
-                Admin dashboard
-              </NavLink>
-            </nav>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right md:block">
-              <p className="text-sm font-semibold text-[var(--navy-950)]">
-                {user.fullName}
-              </p>
+          <nav className="hidden items-center justify-center gap-6 text-sm font-medium text-[var(--ink-700)] md:flex">
+              <NavLink href="/admin" exact>
+                Home
+              </NavLink>
+              <NavLink href="/admin/products">
+                Products
+              </NavLink>
+              <NavLink href="/admin/sections">
+                Sections
+              </NavLink>
+              <NavLink href="/admin/discounts">
+                Discounts
+              </NavLink>
+              <NavLink href="/admin/orders">
+                Orders
+              </NavLink>
+          </nav>
+
+          <div className="flex flex-col items-center gap-2 justify-self-end md:flex-row md:items-center md:gap-3">
+            <p className="order-2 hidden text-sm font-semibold text-[var(--navy-950)] md:block md:order-none md:text-right">
+              {user.username}
+            </p>
+            <div className="order-1 md:order-none">
+              <LogoutButton />
             </div>
-            <LogoutButton />
           </div>
         </div>
       </header>
