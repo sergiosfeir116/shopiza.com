@@ -2,7 +2,7 @@ export const APP_NAME = "Shopiza";
 export const SUPPORT_EMAIL =
   process.env.SHOPIZA_SUPPORT_EMAIL ?? "charbel.g.andraos@gmail.com";
 export const SUPPORT_WHATSAPP =
-  process.env.SHOPIZA_SUPPORT_WHATSAPP ?? "+9613118776";
+  process.env.SHOPIZA_SUPPORT_WHATSAPP ?? "+96170300747";
 export const AUTH_COOKIE_NAME = "shopiza_session";
 export const VERIFICATION_CODE_TTL_MINUTES = 15;
 export const PENDING_REGISTRATION_TTL_MINUTES = 24 * 60;
@@ -16,8 +16,8 @@ export const ALLOWED_PRODUCT_IMAGE_TYPES = [
 
 export const ORDER_STATUS_LABELS = {
   PENDING: "Pending",
-  IN_PROGRESS: "In progress",
-  ON_THE_WAY: "On the way",
+  IN_PROGRESS: "In Progress",
+  ON_THE_WAY: "On The Way",
   DELIVERED: "Delivered",
 } as const;
 

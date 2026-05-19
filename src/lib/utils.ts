@@ -136,8 +136,33 @@ export function sanitizeText(value: string) {
     .trim();
 }
 
-export function buildWhatsAppUrl(message = "Hello Shopiza, I need some help.") {
-  const cleaned = SUPPORT_WHATSAPP.replace(/[^\d]/g, "");
+export function buildGoogleMapsUrl(input: {
+  locationLabel: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  placeId?: string | null;
+}) {
+  if (input.latitude !== null && input.latitude !== undefined &&
+      input.longitude !== null && input.longitude !== undefined) {
+    return `https://www.google.com/maps?q=${input.latitude},${input.longitude}`;
+  }
+
+  const query = encodeURIComponent(input.locationLabel);
+
+  if (input.placeId) {
+    return `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${encodeURIComponent(
+      input.placeId,
+    )}`;
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${query}`;
+}
+
+export function buildWhatsAppUrl(
+  message = "Hello Shopiza, I need some help.",
+  phoneNumber = SUPPORT_WHATSAPP,
+) {
+  const cleaned = phoneNumber.replace(/[^\d]/g, "");
   return `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
 }
 

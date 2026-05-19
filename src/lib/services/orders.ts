@@ -1,10 +1,68 @@
 import "server-only";
 
-import { type OrderStatus } from "@prisma/client";
+import { type OrderStatus, type PaymentMethod } from "@prisma/client";
 
-import { formatCurrency, formatDateTime, generateOrderNumber } from "@/lib/utils";
+import {
+  sendOrderConfirmationEmail,
+  sendOrderStatusUpdateEmail,
+  type OrderEmailPayload,
+} from "@/lib/email";
 import { prisma } from "@/lib/prisma";
-import { sendOrderNotificationEmail } from "@/lib/services/auth";
+import { logEmailError } from "@/lib/services/mail";
+import { sendAdminOrderNotificationWhatsApp } from "@/lib/services/whatsapp";
+import { generateOrderNumber } from "@/lib/utils";
+
+type EmailReadyOrder = {
+  orderNumber: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhoneNumber: string;
+  destinationLocation: string;
+  destinationLatitude: number | null;
+  destinationLongitude: number | null;
+  destinationPlaceId: string | null;
+  totalPriceCents: number;
+  paymentMethod: PaymentMethod;
+  items: Array<{
+    productNameSnapshot: string;
+    quantity: number;
+    unitPriceSnapshotCents: number;
+    totalPriceSnapshotCents: number;
+  }>;
+};
+
+function buildOrderEmailPayload(order: EmailReadyOrder): OrderEmailPayload {
+  return {
+    orderNumber: order.orderNumber,
+    customerName: order.clientName,
+    customerEmail: order.clientEmail,
+    customerPhoneNumber: order.clientPhoneNumber,
+    destinationLocation: order.destinationLocation,
+    destinationLatitude: order.destinationLatitude,
+    destinationLongitude: order.destinationLongitude,
+    destinationPlaceId: order.destinationPlaceId,
+    totalPriceCents: order.totalPriceCents,
+    paymentMethod: order.paymentMethod,
+    items: order.items.map((item) => ({
+      productName: item.productNameSnapshot,
+      quantity: item.quantity,
+      unitPriceCents: item.unitPriceSnapshotCents,
+      totalPriceCents: item.totalPriceSnapshotCents,
+    })),
+  };
+}
+
+async function attemptOrderEmail(
+  context: string,
+  metadata: Record<string, unknown>,
+  callback: () => Promise<void>,
+) {
+  try {
+    await callback();
+  } catch (error) {
+    logEmailError(context, error, metadata);
+  }
+}
 
 export async function createOrderFromReservation(input: {
   sessionId: string;
@@ -97,27 +155,30 @@ export async function createOrderFromReservation(input: {
     return createdOrder;
   });
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: input.userId,
-    },
-  });
+  const emailPayload = buildOrderEmailPayload(order);
 
-  await sendOrderNotificationEmail({
-    orderNumber: order.orderNumber,
-    clientName: user.fullName,
-    clientEmail: user.email,
-    clientPhoneNumber: user.phoneNumber,
-    destinationLocation: input.destinationLocation,
-    totalPriceText: formatCurrency(order.totalPriceCents),
-    orderDateText: formatDateTime(order.createdAt),
-    lines: order.items.map(
-      (item) =>
-        `${item.productNameSnapshot} x${item.quantity} - ${formatCurrency(
-          item.totalPriceSnapshotCents,
-        )}`,
+  await Promise.all([
+    attemptOrderEmail(
+      "Failed to send customer order confirmation email.",
+      {
+        orderNumber: order.orderNumber,
+        recipient: order.clientEmail,
+      },
+      async () => {
+        await sendOrderConfirmationEmail(emailPayload);
+      },
     ),
-  });
+    attemptOrderEmail(
+      "Failed to send admin new order WhatsApp notification.",
+      {
+        orderNumber: order.orderNumber,
+        recipient: "SUPPORT_WHATSAPP",
+      },
+      async () => {
+        await sendAdminOrderNotificationWhatsApp(emailPayload);
+      },
+    ),
+  ]);
 
   return order;
 }
@@ -188,12 +249,51 @@ export async function getAdminOrders(input?: {
 }
 
 export async function updateOrderStatus(orderId: string, status: OrderStatus) {
-  return prisma.order.update({
+  const existingOrder = await prisma.order.findUnique({
+    where: {
+      id: orderId,
+    },
+    include: {
+      items: true,
+    },
+  });
+
+  if (!existingOrder) {
+    throw new Error("Order not found.");
+  }
+
+  if (existingOrder.status === status) {
+    return existingOrder;
+  }
+
+  const order = await prisma.order.update({
     where: {
       id: orderId,
     },
     data: {
       status,
     },
+    include: {
+      items: true,
+    },
   });
+
+  await attemptOrderEmail(
+    "Failed to send customer order status update email.",
+    {
+      orderNumber: order.orderNumber,
+      status,
+      recipient: order.clientEmail,
+    },
+    async () => {
+      await sendOrderStatusUpdateEmail({
+        orderNumber: order.orderNumber,
+        customerName: order.clientName,
+        customerEmail: order.clientEmail,
+        status: order.status,
+      });
+    },
+  );
+
+  return order;
 }

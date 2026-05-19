@@ -5,7 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useCart } from "@/components/store/cart-provider";
-import { LocationPicker } from "@/components/store/location-picker";
+import { LocationPicker, requestCurrentLocationValue } from "@/components/store/location-picker";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 
@@ -34,9 +34,9 @@ export function CheckoutForm({
           Checkout for {userName}
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
-          Cash on delivery only. For this order, use Google Maps below to either
-          pick your current location or choose another destination. We store that
-          delivery selection with this order.
+          Cash on delivery only. If no delivery point is selected yet, we request
+          your current location before submitting the order. You can also use the
+          button below to grant location access and load it in advance.
         </p>
         <div className="mt-8">
           <LocationPicker value={location} onChange={setLocation} />
@@ -46,21 +46,38 @@ export function CheckoutForm({
           className="mt-6"
           disabled={pending || cart.items.length === 0}
           onClick={async () => {
-            if (!sessionId || !location.label) {
-              toast.error("Choose a destination location before submitting.");
+            if (!sessionId) {
+              toast.error("Your cart session is missing.");
               return;
             }
 
             setPending(true);
+            let orderLocation = location;
+
+            if (!orderLocation.label) {
+              try {
+                orderLocation = await requestCurrentLocationValue();
+                setLocation(orderLocation);
+              } catch (error) {
+                toast.error(
+                  error instanceof Error
+                    ? error.message
+                    : "Choose a destination location before submitting.",
+                );
+                setPending(false);
+                return;
+              }
+            }
+
             const response = await fetch("/api/orders", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 cartSessionId: sessionId,
-                destinationLocation: location.label,
-                destinationLatitude: location.latitude,
-                destinationLongitude: location.longitude,
-                destinationPlaceId: location.placeId,
+                destinationLocation: orderLocation.label,
+                destinationLatitude: orderLocation.latitude,
+                destinationLongitude: orderLocation.longitude,
+                destinationPlaceId: orderLocation.placeId,
               }),
             });
 

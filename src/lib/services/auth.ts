@@ -15,7 +15,6 @@ import { sendSms } from "@/lib/services/sms";
 import {
   PASSWORD_RESET_TTL_MINUTES,
   PENDING_REGISTRATION_TTL_MINUTES,
-  SUPPORT_EMAIL,
   VERIFICATION_CODE_TTL_MINUTES,
 } from "@/lib/constants";
 import {
@@ -498,47 +497,5 @@ export async function resetPasswordWithCode(input: {
     userId: user.id,
     eventType: "password-reset.completed",
     message: `Password reset completed via ${input.channel}.`,
-  });
-}
-
-export async function sendOrderNotificationEmail(input: {
-  orderNumber: string;
-  clientName: string;
-  clientEmail: string;
-  clientPhoneNumber: string;
-  destinationLocation: string;
-  totalPriceText: string;
-  orderDateText: string;
-  lines: string[];
-}) {
-  const html = `
-    <h1>New Shopiza order</h1>
-    <p><strong>Order number:</strong> ${input.orderNumber}</p>
-    <p><strong>Client:</strong> ${input.clientName}</p>
-    <p><strong>Email:</strong> ${input.clientEmail}</p>
-    <p><strong>Phone:</strong> ${input.clientPhoneNumber}</p>
-    <p><strong>Destination:</strong> ${input.destinationLocation}</p>
-    <p><strong>Order date:</strong> ${input.orderDateText}</p>
-    <p><strong>Total:</strong> ${input.totalPriceText}</p>
-    <ul>${input.lines.map((line) => `<li>${line}</li>`).join("")}</ul>
-  `;
-
-  const text = [
-    `New Shopiza order`,
-    `Order number: ${input.orderNumber}`,
-    `Client: ${input.clientName}`,
-    `Email: ${input.clientEmail}`,
-    `Phone: ${input.clientPhoneNumber}`,
-    `Destination: ${input.destinationLocation}`,
-    `Order date: ${input.orderDateText}`,
-    `Total: ${input.totalPriceText}`,
-    ...input.lines.map((line) => `- ${line}`),
-  ].join("\n");
-
-  await sendMail({
-    to: SUPPORT_EMAIL,
-    subject: `New Shopiza order ${input.orderNumber}`,
-    html,
-    text,
   });
 }

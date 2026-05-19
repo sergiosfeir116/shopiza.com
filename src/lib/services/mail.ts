@@ -1,45 +1,95 @@
 import "server-only";
 
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 import { env } from "@/lib/env";
 
+type MailRecipient = string | string[];
+
 type MailInput = {
-  to: string;
+  to: MailRecipient;
   subject: string;
   html: string;
   text: string;
+  replyTo?: MailRecipient;
 };
 
-function getTransporter() {
-  if (!env.smtp.host || !env.smtp.user || !env.smtp.password) {
-    return null;
+let resendClient: Resend | null | undefined;
+
+function getResendClient() {
+  if (resendClient !== undefined) {
+    return resendClient;
   }
 
-  return nodemailer.createTransport({
-    host: env.smtp.host,
-    port: env.smtp.port,
-    secure: env.smtp.secure,
-    auth: {
-      user: env.smtp.user,
-      pass: env.smtp.password,
-    },
+  resendClient = env.email.resendApiKey
+    ? new Resend(env.email.resendApiKey)
+    : null;
+
+  return resendClient;
+}
+
+function formatRecipients(value: MailRecipient) {
+  return Array.isArray(value) ? value.join(", ") : value;
+}
+
+function normalizeError(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    };
+  }
+
+  return error;
+}
+
+export function logEmailError(
+  context: string,
+  error: unknown,
+  metadata?: Record<string, unknown>,
+) {
+  console.error(`[email] ${context}`, {
+    ...metadata,
+    error: normalizeError(error),
   });
 }
 
 export async function sendMail(input: MailInput) {
-  const transporter = getTransporter();
+  const client = getResendClient();
 
-  if (!transporter) {
-    console.info(`[mail:dev] to=${input.to} subject=${input.subject}\n${input.text}`);
-    return;
+  if (!client || !env.email.fromEmail) {
+    const reason = [
+      !env.email.resendApiKey ? "RESEND_API_KEY" : null,
+      !env.email.fromEmail ? "FROM_EMAIL" : null,
+    ]
+      .filter(Boolean)
+      .join(" and ");
+    const message = `[mail] Skipping email because ${reason} is not configured. to=${formatRecipients(
+      input.to,
+    )} subject=${input.subject}`;
+
+    if (process.env.NODE_ENV === "production") {
+      console.warn(message);
+    } else {
+      console.info(`${message}\n${input.text}`);
+    }
+
+    return null;
   }
 
-  await transporter.sendMail({
-    from: env.smtp.from,
+  const response = await client.emails.send({
+    from: env.email.fromEmail,
     to: input.to,
     subject: input.subject,
     html: input.html,
     text: input.text,
+    replyTo: input.replyTo,
   });
+
+  if (response.error) {
+    throw new Error(response.error.message);
+  }
+
+  return response.data;
 }
