@@ -87,14 +87,11 @@ export async function PUT(request: Request) {
       return jsonError("Pending registration not found or expired.", 404);
     }
 
-    await issueVerificationCodeForPendingRegistration(
-      registration,
-      payload.data.channel,
-    );
+    await issueVerificationCodeForPendingRegistration(registration);
 
     return jsonResponse({
       success: true,
-      message: `A new ${payload.data.channel === "EMAIL" ? "email" : "SMS"} code was sent.`,
+      message: "A new email code was sent.",
     });
   } catch (error) {
     if (error instanceof RateLimitError) {

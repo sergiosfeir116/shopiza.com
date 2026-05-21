@@ -2,8 +2,6 @@ import { type Discount, type ProductImage } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { format } from "date-fns";
 
-import { SUPPORT_WHATSAPP } from "@/lib/constants";
-
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
@@ -156,14 +154,6 @@ export function buildGoogleMapsUrl(input: {
   }
 
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
-}
-
-export function buildWhatsAppUrl(
-  message = "Hello Shopiza, I need some help.",
-  phoneNumber = SUPPORT_WHATSAPP,
-) {
-  const cleaned = phoneNumber.replace(/[^\d]/g, "");
-  return `https://wa.me/${cleaned}?text=${encodeURIComponent(message)}`;
 }
 
 export function sleep(ms: number) {

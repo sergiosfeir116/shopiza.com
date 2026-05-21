@@ -2,7 +2,7 @@ import "server-only";
 
 import { type OrderStatus, type PaymentMethod } from "@prisma/client";
 
-import { APP_NAME, ORDER_STATUS_LABELS } from "@/lib/constants";
+import { APP_NAME, ORDER_STATUS_LABELS, SUPPORT_EMAIL } from "@/lib/constants";
 import { sendMail } from "@/lib/services/mail";
 import { buildGoogleMapsUrl, formatCurrency } from "@/lib/utils";
 
@@ -247,6 +247,74 @@ export async function sendOrderConfirmationEmail(order: OrderEmailPayload) {
   await sendMail({
     to: order.customerEmail,
     subject: `${APP_NAME} order confirmation ${order.orderNumber}`,
+    html,
+    text,
+  });
+}
+
+export async function sendAdminOrderNotificationEmail(order: OrderEmailPayload) {
+  const mapsUrl = buildGoogleMapsUrl({
+    locationLabel: order.destinationLocation,
+    latitude: order.destinationLatitude,
+    longitude: order.destinationLongitude,
+    placeId: order.destinationPlaceId,
+  });
+  const summaryRows: EmailSectionRow[] = [
+    { label: "Customer", value: order.customerName },
+    { label: "Customer email", value: order.customerEmail },
+    { label: "Customer phone", value: order.customerPhoneNumber },
+    { label: "Order ID", value: order.orderNumber },
+    { label: "Delivery location", value: order.destinationLocation },
+    { label: "Payment method", value: getPaymentMethodLabel(order.paymentMethod) },
+    { label: "Total", value: formatCurrency(order.totalPriceCents) },
+  ];
+
+  const html = renderEmailLayout({
+    eyebrow: "New order",
+    title: `New order received: ${order.orderNumber}`,
+    intro:
+      "A customer placed a new order. Review the order details and follow up from the admin dashboard.",
+    summaryRows,
+    content: `
+      <div style="margin-bottom: 22px;">
+        <p style="margin: 0 0 14px; color: ${BRAND.heading}; font-size: 16px; font-weight: 700;">
+          Ordered products
+        </p>
+        ${renderOrderItemsTable(order.items)}
+      </div>
+      <div style="padding: 18px 20px; border: 1px solid ${BRAND.line}; border-radius: 20px; background: #f9fbfe;">
+        <p style="margin: 0 0 8px; color: ${BRAND.heading}; font-size: 15px; font-weight: 700;">
+          Delivery location
+        </p>
+        <p style="margin: 0 0 12px; color: ${BRAND.text}; font-size: 14px; line-height: 1.7;">
+          ${escapeHtml(order.destinationLocation)}
+        </p>
+        <a href="${escapeHtml(mapsUrl)}" style="color: ${BRAND.accent}; font-size: 14px; font-weight: 700; text-decoration: none;">
+          Open in Google Maps
+        </a>
+      </div>
+    `,
+  });
+
+  const text = [
+    `${APP_NAME} new order notification`,
+    `Customer: ${order.customerName}`,
+    `Customer email: ${order.customerEmail}`,
+    `Customer phone: ${order.customerPhoneNumber}`,
+    `Order ID: ${order.orderNumber}`,
+    `Delivery location: ${order.destinationLocation}`,
+    `Payment method: ${getPaymentMethodLabel(order.paymentMethod)}`,
+    `Total: ${formatCurrency(order.totalPriceCents)}`,
+    `Google Maps: ${mapsUrl}`,
+    "",
+    "Ordered products:",
+    ...buildOrderItemsText(order.items),
+  ].join("\n");
+
+  await sendMail({
+    to: SUPPORT_EMAIL,
+    replyTo: order.customerEmail,
+    subject: `${APP_NAME} new order ${order.orderNumber}`,
     html,
     text,
   });

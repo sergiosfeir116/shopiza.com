@@ -79,14 +79,12 @@ Required/used variables:
 DATABASE_URL="file:./dev.db"
 SESSION_SECRET="replace-with-a-long-random-secret"
 SHOPIZA_SUPPORT_EMAIL="charbel.g.andraos@gmail.com"
-SHOPIZA_SUPPORT_WHATSAPP="+9613118776"
 SHOPIZA_APP_URL="http://localhost:3000"
-SMTP_HOST=""
-SMTP_PORT="587"
-SMTP_SECURE="false"
-SMTP_USER=""
-SMTP_PASSWORD=""
-SMTP_FROM="Shopiza <no-reply@shopiza.local>"
+RESEND_API_KEY=""
+FROM_EMAIL="Shopiza <onboarding@resend.dev>"
+TEST_NOTIFICATION_MODE="capture"
+EMAIL_NOTIFICATION_MODE="live"
+TEST_NOTIFICATION_EMAIL=""
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=""
 ```
@@ -117,9 +115,10 @@ Seeded sample client password:
 - Registration creates a `CLIENT` account by default.
 - Login accepts email or username plus password.
 - Auth sessions are stored in secure HTTP-only cookies and last 7 days.
-- Email verification and SMS verification use separate code flows.
-- Password reset supports both email and SMS code delivery.
-- In development, outgoing email and SMS codes are logged if no provider is configured.
+- Email verification is required before a new account is created.
+- Password reset uses email verification codes only.
+- For providerless testing, set `TEST_NOTIFICATION_MODE="capture"` and optionally fill `TEST_NOTIFICATION_EMAIL`. Captured emails are written to `.dev/notification-outbox.jsonl`.
+- `EMAIL_NOTIFICATION_MODE` can override the global notification mode for email only.
 
 ## Cart and Stock Reservation
 
@@ -144,16 +143,12 @@ When a section is deleted:
 - Products are moved to `archived/unassigned`
 - Admin can later reassign them to a valid section
 
-## Email and SMS Provider Notes
+## Email Delivery Notes
 
 ### Email
 
-- If SMTP credentials are configured, emails are sent through `nodemailer`.
-- If SMTP is not configured, the email payload is logged in development.
-
-### SMS
-
-- The SMS service is intentionally isolated in `src/lib/services/sms.ts` so a real provider can be integrated later.
+- If `EMAIL_NOTIFICATION_MODE="capture"`, emails are not sent through Resend and are written to `.dev/notification-outbox.jsonl` instead.
+- Otherwise, emails use `RESEND_API_KEY` and `FROM_EMAIL`.
 
 ## Google Maps Notes
 
@@ -237,6 +232,4 @@ Recommended follow-up work before a public production deployment:
 - Replace SQLite with PostgreSQL
 - Add integration/e2e tests for auth/cart/checkout/admin flows
 - Add richer audit logging for admin mutations
-- Add provider-backed SMS delivery
-- Add provider-backed transactional email
 - Rotate the seeded admin password immediately

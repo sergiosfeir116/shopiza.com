@@ -49,7 +49,9 @@ export function RegisterForm() {
           return;
         }
 
-        toast.success("Verification codes sent. Finish email and phone verification to create the account.");
+        toast.success(
+          "Verification email sent. Finish email verification to create the account.",
+        );
         router.push(`/verify?registrationId=${data.registrationId}`);
       }}
     >
@@ -93,7 +95,7 @@ export function RegisterForm() {
       </div>
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Starting verification..." : "Create account"}
+        {pending ? "Starting email verification..." : "Create account"}
       </Button>
     </form>
   );

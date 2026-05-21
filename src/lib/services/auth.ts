@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   Prisma,
-  type VerificationChannel,
   type VerificationPurpose,
 } from "@prisma/client";
 
@@ -10,7 +9,6 @@ import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { logSecurityEvent } from "@/lib/security/logger";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/services/mail";
-import { sendSms } from "@/lib/services/sms";
 import {
   PASSWORD_RESET_TTL_MINUTES,
   PENDING_REGISTRATION_TTL_MINUTES,
@@ -129,6 +127,7 @@ export async function registerPendingClientUser(input: {
         phoneNumberNormalized: normalizePhoneNumber(input.phoneNumber),
         passwordHash: await hashPassword(input.password),
         role: "CLIENT",
+        phoneVerified: true,
         expiresAt: new Date(
           Date.now() + PENDING_REGISTRATION_TTL_MINUTES * 60 * 1000,
         ),
@@ -157,23 +156,14 @@ export async function registerPendingClientUser(input: {
 }
 
 async function deliverVerificationCode(
-  target: Pick<PendingRegistration, "email" | "phoneNumber">,
-  channel: VerificationChannel,
+  target: Pick<PendingRegistration, "email">,
   code: string,
 ) {
-  if (channel === "EMAIL") {
-    await sendMail({
-      to: target.email,
-      subject: "Shopiza email verification code",
-      html: `<p>Your Shopiza email verification code is <strong>${code}</strong>. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.</p>`,
-      text: `Your Shopiza email verification code is ${code}. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
-    });
-    return;
-  }
-
-  await sendSms({
-    phoneNumber: target.phoneNumber,
-    message: `Shopiza verification code: ${code}. Expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
+  await sendMail({
+    to: target.email,
+    subject: "Shopiza email verification code",
+    html: `<p>Your Shopiza email verification code is <strong>${code}</strong>. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.</p>`,
+    text: `Your Shopiza email verification code is ${code}. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
   });
 }
 
@@ -202,7 +192,6 @@ export async function findPendingRegistrationById(registrationId: string) {
 
 export async function issueVerificationCodeForPendingRegistration(
   registration: PendingRegistration,
-  channel: VerificationChannel,
 ) {
   if (registration.expiresAt.getTime() < Date.now()) {
     await prisma.pendingRegistration.delete({
@@ -213,8 +202,7 @@ export async function issueVerificationCodeForPendingRegistration(
     throw new AuthError("Registration verification expired. Register again.");
   }
 
-  const purpose: VerificationPurpose =
-    channel === "EMAIL" ? "EMAIL_VERIFICATION" : "PHONE_VERIFICATION";
+  const purpose: VerificationPurpose = "EMAIL_VERIFICATION";
   const code = generateSixDigitCode();
   const expiresAt = new Date(
     Date.now() + VERIFICATION_CODE_TTL_MINUTES * 60 * 1000,
@@ -223,7 +211,7 @@ export async function issueVerificationCodeForPendingRegistration(
   await prisma.pendingRegistrationCode.deleteMany({
     where: {
       pendingRegistrationId: registration.id,
-      channel,
+      channel: "EMAIL",
       purpose,
       consumedAt: null,
     },
@@ -232,28 +220,26 @@ export async function issueVerificationCodeForPendingRegistration(
   await prisma.pendingRegistrationCode.create({
     data: {
       pendingRegistrationId: registration.id,
-      channel,
+      channel: "EMAIL",
       purpose,
-      destination: channel === "EMAIL" ? registration.email : registration.phoneNumber,
+      destination: registration.email,
       codeHash: await hashPassword(code),
       expiresAt,
     },
   });
 
-  await deliverVerificationCode(registration, channel, code);
+  await deliverVerificationCode(registration, code);
 }
 
 export async function verifyPendingRegistrationCode(input: {
   registrationId: string;
-  channel: VerificationChannel;
   code: string;
 }) {
-  const purpose: VerificationPurpose =
-    input.channel === "EMAIL" ? "EMAIL_VERIFICATION" : "PHONE_VERIFICATION";
+  const purpose: VerificationPurpose = "EMAIL_VERIFICATION";
   const record = await prisma.pendingRegistrationCode.findFirst({
     where: {
       pendingRegistrationId: input.registrationId,
-      channel: input.channel,
+      channel: "EMAIL",
       purpose,
       consumedAt: null,
       expiresAt: {
@@ -294,18 +280,9 @@ export async function verifyPendingRegistrationCode(input: {
       where: {
         id: input.registrationId,
       },
-      data:
-        input.channel === "EMAIL"
-          ? { emailVerified: true }
-          : { phoneVerified: true },
+      data: { emailVerified: true },
       select: pendingRegistrationSelect,
     });
-
-    if (!pendingRegistration.emailVerified || !pendingRegistration.phoneVerified) {
-      return {
-        fullyVerified: false,
-      };
-    }
 
     try {
       const createdUser = await transaction.user.create({
@@ -371,8 +348,8 @@ export async function authenticateUser(identifier: string, password: string) {
     throw new AuthError("Invalid credentials.");
   }
 
-  if (!user.emailVerified || !user.phoneVerified) {
-    throw new AuthError("Verify your email and phone number before logging in.");
+  if (!user.emailVerified) {
+    throw new AuthError("Verify your email before logging in.");
   }
 
   await logSecurityEvent({

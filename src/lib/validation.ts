@@ -42,12 +42,10 @@ export const loginSchema = z.object({
 
 export const verificationRequestSchema = z.object({
   registrationId: z.uuid(),
-  channel: z.enum(["EMAIL", "SMS"]),
 });
 
 export const verificationConfirmSchema = z.object({
   registrationId: z.uuid(),
-  channel: z.enum(["EMAIL", "SMS"]),
   code: z.string().length(6, "Enter the 6-digit verification code."),
 });
 

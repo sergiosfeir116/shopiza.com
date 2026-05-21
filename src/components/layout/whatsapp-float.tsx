@@ -1,18 +1,27 @@
-import { MessageCircle } from "lucide-react";
+const WHATSAPP_PHONE_NUMBER = "+96103118776";
 
-import { buildWhatsAppUrl } from "@/lib/utils";
+function getWhatsAppUrl(phoneNumber: string) {
+  const cleaned = phoneNumber.replace(/[^\d]/g, "");
+  return `https://wa.me/${cleaned}`;
+}
 
 export function WhatsAppFloat() {
   return (
     <a
-      href={buildWhatsAppUrl()}
+      href={getWhatsAppUrl(WHATSAPP_PHONE_NUMBER)}
       target="_blank"
       rel="noreferrer"
-      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-3 rounded-full bg-[linear-gradient(135deg,var(--pink-500),var(--purple-500))] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(244,71,161,0.3)] hover:-translate-y-0.5"
+      aria-label="Chat on WhatsApp"
+      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-3 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(37,211,102,0.32)] transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[#20ba59] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 sm:bottom-6 sm:right-6"
     >
-      <MessageCircle className="h-5 w-5" />
-      <span className="hidden sm:inline">Chat with us on WhatsApp</span>
-      <span className="sm:hidden">WhatsApp</span>
+      <span
+        aria-hidden="true"
+        className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/18 text-base"
+      >
+        W
+      </span>
+      <span className="hidden sm:inline">Chat on WhatsApp</span>
+      <span className="sm:hidden">Chat</span>
     </a>
   );
 }

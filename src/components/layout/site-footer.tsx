@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { ShopizaLogo } from "@/components/brand/shopiza-logo";
-import { buildWhatsAppUrl } from "@/lib/utils";
 
 export function SiteFooter({ supportEmail }: { supportEmail: string }) {
   return (
@@ -25,9 +24,6 @@ export function SiteFooter({ supportEmail }: { supportEmail: string }) {
           </h3>
           <div className="mt-4 flex flex-col gap-3 text-sm text-[var(--ink-700)]">
             <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
-            <a href={buildWhatsAppUrl()} target="_blank" rel="noreferrer">
-              Chat with us on WhatsApp
-            </a>
           </div>
         </div>
       </div>

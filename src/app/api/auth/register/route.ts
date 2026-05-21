@@ -32,15 +32,12 @@ export async function POST(request: Request) {
 
     const registration = await registerPendingClientUser(payload.data);
 
-    await Promise.all([
-      issueVerificationCodeForPendingRegistration(registration, "EMAIL"),
-      issueVerificationCodeForPendingRegistration(registration, "SMS"),
-    ]);
+    await issueVerificationCodeForPendingRegistration(registration);
 
     return jsonResponse({
       success: true,
       registrationId: registration.id,
-      message: "Registration started. Verify your email and phone to create the account.",
+      message: "Registration started. Verify your email to create the account.",
     });
   } catch (error) {
     if (error instanceof ConflictError) {

@@ -17,10 +17,10 @@ export default async function VerifyPage({
           Verification
         </p>
         <h1 className="mt-3 display-title text-4xl font-semibold text-[var(--navy-950)]">
-          Verify your email and phone
+          Verify your email
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
-          Enter both codes to finish registration. Your account will only be created after email and phone verification succeed.
+          Enter the email code to finish registration. Your account will only be created after email verification succeeds.
         </p>
         <div className="mt-8">
           {registrationId ? (

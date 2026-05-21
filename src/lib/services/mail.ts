@@ -3,6 +3,7 @@ import "server-only";
 import { Resend } from "resend";
 
 import { env } from "@/lib/env";
+import { captureNotification } from "@/lib/services/test-notifications";
 
 type MailRecipient = string | string[];
 
@@ -56,6 +57,22 @@ export function logEmailError(
 }
 
 export async function sendMail(input: MailInput) {
+  if (env.notifications.emailMode === "capture") {
+    const deliveredTo = env.notifications.emailOverride || input.to;
+
+    await captureNotification({
+      channel: "email",
+      originalTo: input.to,
+      deliveredTo,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+      replyTo: input.replyTo,
+    });
+
+    return null;
+  }
+
   const client = getResendClient();
 
   if (!client || !env.email.fromEmail) {

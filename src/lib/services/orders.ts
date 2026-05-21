@@ -3,13 +3,13 @@ import "server-only";
 import { Prisma, type OrderStatus, type PaymentMethod } from "@prisma/client";
 
 import {
+  sendAdminOrderNotificationEmail,
   sendOrderConfirmationEmail,
   sendOrderStatusUpdateEmail,
   type OrderEmailPayload,
 } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 import { logEmailError } from "@/lib/services/mail";
-import { sendAdminOrderNotificationWhatsApp } from "@/lib/services/whatsapp";
 import { generateOrderNumber } from "@/lib/utils";
 
 type EmailReadyOrder = {
@@ -169,13 +169,13 @@ export async function createOrderFromReservation(input: {
       },
     ),
     attemptOrderEmail(
-      "Failed to send admin new order WhatsApp notification.",
+      "Failed to send admin new order email notification.",
       {
         orderNumber: order.orderNumber,
-        recipient: "SUPPORT_WHATSAPP",
+        recipient: "SUPPORT_EMAIL",
       },
       async () => {
-        await sendAdminOrderNotificationWhatsApp(emailPayload);
+        await sendAdminOrderNotificationEmail(emailPayload);
       },
     ),
   ]);

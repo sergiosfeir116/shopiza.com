@@ -14,7 +14,7 @@ export default async function RegisterPage() {
           Join Shopiza as a client
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
-          New accounts start as clients by default and are only created after both email and phone are verified. Delivery location is chosen separately for each order during checkout.
+          New accounts start as clients by default and are only created after email verification. Delivery location is chosen separately for each order during checkout.
         </p>
         <div className="mt-8">
           <RegisterForm />
