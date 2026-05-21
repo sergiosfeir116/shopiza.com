@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [],
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/uploads/products/:filename",
+          destination: "/media/uploads/products/:filename",
+        },
+      ],
+    };
+  },
   async headers() {
     return [
       {

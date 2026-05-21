@@ -28,7 +28,7 @@ It includes:
 - All primary application IDs are UUIDs.
 - The seeded admin account is intended for development/bootstrap only.
 - Product images in seed data are generated through an internal media route.
-- Uploaded admin product images are stored locally in `public/uploads/products`.
+- Uploaded admin product images keep the `/uploads/products/...` URL shape, but are served through a route handler. Local development stores them in `public/uploads/products`; production can point `PRODUCT_UPLOADS_DIR` at any writable directory.
 - The workspace did not contain an actual Shopiza logo asset file, so the app uses a branded text/mark lockup matched to the requested dark navy, magenta, and purple palette.
 
 ## Local Setup
@@ -80,6 +80,7 @@ DATABASE_URL="file:./dev.db"
 SESSION_SECRET="replace-with-a-long-random-secret"
 SHOPIZA_SUPPORT_EMAIL="charbel.g.andraos@gmail.com"
 SHOPIZA_APP_URL="http://localhost:3000"
+PRODUCT_UPLOADS_DIR=""
 RESEND_API_KEY=""
 FROM_EMAIL="Shopiza <onboarding@resend.dev>"
 TEST_NOTIFICATION_MODE="capture"
@@ -88,6 +89,8 @@ TEST_NOTIFICATION_EMAIL=""
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=""
 ```
+
+`PRODUCT_UPLOADS_DIR` is optional. If omitted, local development writes to `public/uploads/products`. In production, the app falls back to the OS temp directory, which is writable but usually not durable on serverless hosts, so a mounted volume or object storage remains the right long-term production setup.
 
 ## Database Commands
 
