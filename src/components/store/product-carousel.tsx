@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import { cn } from "@/lib/utils";
+import { cn, isUploadedProductImageUrl } from "@/lib/utils";
 
 export function ProductCarousel({
   images,
@@ -32,6 +32,7 @@ export function ProductCarousel({
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 50vw"
               priority
+              unoptimized={isUploadedProductImageUrl(currentImage.imageUrl)}
             />
           ) : null}
         </div>
@@ -55,6 +56,7 @@ export function ProductCarousel({
               fill
               className="rounded-[14px] object-cover"
               sizes="120px"
+              unoptimized={isUploadedProductImageUrl(image.imageUrl)}
             />
           </button>
         ))}

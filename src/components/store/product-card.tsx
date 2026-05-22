@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { AddToCartButton } from "@/components/store/add-to-cart-button";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isUploadedProductImageUrl } from "@/lib/utils";
 
 type ProductCardProps = {
   product: {
@@ -41,6 +41,7 @@ export function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-cover transition duration-300 group-hover:scale-[1.03]"
               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 33vw, 25vw"
+              unoptimized={isUploadedProductImageUrl(product.mainImage.imageUrl)}
             />
           ) : null}
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">

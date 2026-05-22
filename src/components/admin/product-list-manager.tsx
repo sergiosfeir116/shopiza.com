@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button, ButtonLink } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isUploadedProductImageUrl } from "@/lib/utils";
 
 type ProductListItem = {
   id: string;
@@ -48,6 +48,7 @@ export function ProductListManager({ products }: { products: ProductListItem[] }
                       fill
                       className="object-cover"
                       sizes="96px"
+                      unoptimized={isUploadedProductImageUrl(product.mainImage.imageUrl)}
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-xs font-semibold uppercase tracking-[0.24em] text-[var(--ink-500)]">

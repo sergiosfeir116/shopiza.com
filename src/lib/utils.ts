@@ -102,6 +102,10 @@ export function getMainImage(images: ProductImage[]) {
   );
 }
 
+export function isUploadedProductImageUrl(imageUrl: string) {
+  return imageUrl.startsWith("/uploads/products/");
+}
+
 export function calculateDiscountedPriceCents(
   priceCents: number,
   type: "PERCENTAGE" | "FIXED_AMOUNT",

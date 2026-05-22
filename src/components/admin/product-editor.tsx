@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { SelectField, TextAreaField, TextField } from "@/components/ui/field";
+import { isUploadedProductImageUrl } from "@/lib/utils";
 
 type ProductImageItem = {
   id?: string;
@@ -267,6 +268,7 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
                   fill
                   className="object-cover"
                   sizes="240px"
+                  unoptimized={isUploadedProductImageUrl(image.imageUrl)}
                 />
               </div>
               <label className="mt-3 flex items-center gap-2 text-sm font-medium text-[var(--navy-950)]">

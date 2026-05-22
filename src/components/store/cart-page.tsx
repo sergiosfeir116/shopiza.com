@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { useCart } from "@/components/store/cart-provider";
 import { QuantityStepper } from "@/components/store/quantity-stepper";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, isUploadedProductImageUrl } from "@/lib/utils";
 
 export function CartPageClient() {
   const { cart, isReady, isMutating, setQuantity, clearCart } = useCart();
@@ -53,6 +53,7 @@ export function CartPageClient() {
                   fill
                   className="object-cover"
                   sizes="120px"
+                  unoptimized={isUploadedProductImageUrl(item.product.mainImage.imageUrl)}
                 />
               ) : null}
             </div>
