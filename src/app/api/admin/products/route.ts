@@ -23,7 +23,6 @@ export async function POST(request: Request) {
 
     const product = await upsertProduct({
       id: payload.data.id,
-      uploadedByUserId: user.id,
       name: payload.data.name,
       description: payload.data.description,
       priceCents: payload.data.priceCents,

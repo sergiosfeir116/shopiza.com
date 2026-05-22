@@ -82,7 +82,6 @@ export const sectionSchema = z.object({
 });
 
 export const productImageSchema = z.object({
-  uploadedImageId: z.uuid().optional(),
   imageUrl: z.string().min(1),
   altText: z.string().max(160).optional().or(z.literal("")),
   isMain: z.boolean(),

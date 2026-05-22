@@ -1,8 +1,4 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
-import {
-  createUploadedProductImages,
-  deleteUploadedProductImage,
-} from "@/lib/services/admin";
 import { jsonError, jsonResponse } from "@/lib/http";
 import { assertSameOrigin } from "@/lib/security/request";
 import { deleteStoredProductImage, saveProductImage } from "@/lib/uploads";
@@ -29,23 +25,9 @@ export async function POST(request: Request) {
 
     const imageUrls = await Promise.all(uploaded.map((file) => saveProductImage(file)));
 
-    let images;
-    try {
-      images = await createUploadedProductImages({
-        uploadedByUserId: user.id,
-        imageUrls,
-      });
-    } catch (error) {
-      await Promise.allSettled(imageUrls.map((imageUrl) => deleteStoredProductImage(imageUrl)));
-      throw error;
-    }
-
     return jsonResponse({
       success: true,
-      images: images.map((image) => ({
-        id: image.id,
-        imageUrl: image.imageUrl,
-      })),
+      imageUrls,
     });
   } catch (error) {
     if (error instanceof Error) {
@@ -69,19 +51,10 @@ export async function DELETE(request: Request) {
       return jsonError("Admin access required.", 403);
     }
 
-    const payload = (await request.json()) as { id?: string; imageUrl?: string };
+    const payload = (await request.json()) as { imageUrl?: string };
 
-    if (!payload.id || !payload.imageUrl) {
-      return jsonError("Image id and image URL are required.", 400);
-    }
-
-    const result = await deleteUploadedProductImage({
-      id: payload.id,
-      uploadedByUserId: user.id,
-    });
-
-    if (result.count === 0) {
-      return jsonError("Uploaded image not found.", 404);
+    if (!payload.imageUrl) {
+      return jsonError("Image URL is required.", 400);
     }
 
     await deleteStoredProductImage(payload.imageUrl);

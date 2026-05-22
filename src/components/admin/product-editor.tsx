@@ -10,7 +10,6 @@ import { SelectField, TextAreaField, TextField } from "@/components/ui/field";
 
 type ProductImageItem = {
   id?: string;
-  uploadedImageId?: string;
   imageUrl: string;
   altText?: string | null;
   isMain: boolean;
@@ -71,29 +70,25 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
       });
       const uploadData = (await uploadResponse.json()) as {
         message?: string;
-        images?: Array<{
-          id: string;
-          imageUrl: string;
-        }>;
+        imageUrls?: string[];
       };
 
-      if (!uploadResponse.ok || !uploadData.images) {
+      if (!uploadResponse.ok || !uploadData.imageUrls) {
         toast.error(uploadData.message ?? "Image upload failed.");
         return;
       }
 
-      const { images: uploadedImages } = uploadData;
+      const { imageUrls } = uploadData;
       setImages((current) => [
         ...current,
-        ...uploadedImages.map((image, index) => ({
-          uploadedImageId: image.id,
-          imageUrl: image.imageUrl,
+        ...imageUrls.map((imageUrl, index) => ({
+          imageUrl,
           altText: "",
           isMain: false,
           sortOrder: current.length + index,
         })),
       ]);
-      toast.success("Images saved. Choose a main image before saving.");
+      toast.success("Images uploaded successfully. please choose the main image before saving");
     } finally {
       setIsUploadingImages(false);
     }
@@ -124,7 +119,6 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
           sectionId,
           archived: sectionId === "",
           images: nextImages.map((image, index) => ({
-            uploadedImageId: image.uploadedImageId,
             imageUrl: image.imageUrl,
             altText: image.altText ?? "",
             isMain: image.isMain,
@@ -263,7 +257,7 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {images.map((image, index) => (
             <article
-              key={image.uploadedImageId ?? image.id ?? `${image.imageUrl}-${index}`}
+              key={image.id ?? `${image.imageUrl}-${index}`}
               className="rounded-[24px] border border-[var(--line-soft)] p-3"
             >
               <div className="relative aspect-square overflow-hidden rounded-[18px] bg-[rgba(19,24,47,0.04)]">
@@ -295,12 +289,11 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
                 type="button"
                 className="mt-3 text-sm font-semibold text-[var(--danger-500)]"
                 onClick={async () => {
-                  if (image.uploadedImageId) {
+                  if (!image.id) {
                     const response = await fetch("/api/admin/uploads/product-image", {
                       method: "DELETE",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
-                        id: image.uploadedImageId,
                         imageUrl: image.imageUrl,
                       }),
                     });
