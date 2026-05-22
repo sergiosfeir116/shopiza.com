@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { ClipboardList, Layers3, LayoutGrid, Package2, Tags } from "lucide-react";
+import { ClipboardList, Layers3, LayoutGrid, Package2, Tags, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
@@ -16,6 +16,7 @@ const items = [
   { href: "/admin/sections", label: "Sections", icon: Layers3 },
   { href: "/admin/discounts", label: "Discounts", icon: Tags },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList },
+  { href: "/admin/clients", label: "Clients", icon: Users },
 ] as const;
 
 function isOrdersPath(pathname: string) {

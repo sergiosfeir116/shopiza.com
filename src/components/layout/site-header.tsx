@@ -12,6 +12,7 @@ const adminNavItems = [
   { href: "/admin/sections", label: "Sections" },
   { href: "/admin/discounts", label: "Discounts" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/clients", label: "Clients" },
 ] as const;
 
 const clientNavItems = [
@@ -43,6 +44,9 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
               </NavLink>
               <NavLink href="/admin/orders">
                 Orders
+              </NavLink>
+              <NavLink href="/admin/clients">
+                Clients
               </NavLink>
           </nav>
 

@@ -403,3 +403,41 @@ export async function getAdminUsersSnapshot() {
     },
   });
 }
+
+export async function getAdminClients(input?: {
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = Math.max(1, input?.page ?? 1);
+  const pageSize = Math.max(1, input?.pageSize ?? 10);
+  const skip = (page - 1) * pageSize;
+  const where = {
+    role: "CLIENT" as const,
+  };
+
+  const [clients, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        fullName: true,
+        username: true,
+        email: true,
+        phoneNumber: true,
+        createdAt: true,
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  return {
+    clients,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
