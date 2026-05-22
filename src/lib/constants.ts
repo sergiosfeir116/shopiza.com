@@ -1,7 +1,7 @@
-export const APP_NAME = "Shopiza";
+export const APP_NAME = "Shopizaj";
 export const SUPPORT_EMAIL =
-  process.env.SHOPIZA_SUPPORT_EMAIL ?? "charbel.g.andraos@gmail.com";
-export const AUTH_COOKIE_NAME = "shopiza_session";
+  process.env.SHOPIZAJ_SUPPORT_EMAIL ?? "charbel.g.andraos@gmail.com";
+export const AUTH_COOKIE_NAME = "shopizaj_session";
 export const VERIFICATION_CODE_TTL_MINUTES = 15;
 export const PENDING_REGISTRATION_TTL_MINUTES = 24 * 60;
 export const PASSWORD_RESET_TTL_MINUTES = 15;

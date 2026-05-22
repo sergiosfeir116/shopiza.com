@@ -1,6 +1,6 @@
 'use client';
 
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useEffectEvent, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { TextField } from "@/components/ui/field";
@@ -17,11 +17,7 @@ export function AdminLiveSearch({
   const searchParams = useSearchParams();
   const [value, setValue] = useState(defaultValue);
 
-  useEffect(() => {
-    setValue(defaultValue);
-  }, [defaultValue]);
-
-  const applySearch = (nextValue: string) => {
+  const applySearch = useEffectEvent((nextValue: string) => {
     const trimmedValue = nextValue.trim();
     const currentQuery = searchParams.get("query") ?? "";
     if (trimmedValue === currentQuery) {
@@ -41,7 +37,7 @@ export function AdminLiveSearch({
     startTransition(() => {
       router.replace(nextUrl, { scroll: false });
     });
-  };
+  });
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -51,7 +47,7 @@ export function AdminLiveSearch({
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [searchParams, value]);
+  }, [value]);
 
   return (
     <TextField

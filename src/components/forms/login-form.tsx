@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Button, ButtonLink } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
+import { PasswordField } from "@/components/ui/password-field";
 
 export function LoginForm() {
   const router = useRouter();
@@ -57,7 +58,11 @@ export function LoginForm() {
         ) : null}
       </div>
       <div>
-        <TextField label="Password" name="password" type="password" />
+        <PasswordField
+          label="Password"
+          name="password"
+          autoComplete="current-password"
+        />
         {errors.password ? (
           <p className="mt-2 text-xs text-[var(--danger-500)]">{errors.password[0]}</p>
         ) : null}

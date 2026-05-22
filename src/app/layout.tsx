@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "Premium full-stack ecommerce built for fast browsing, secure ordering, and polished admin management.",
   metadataBase: new URL("http://localhost:3000"),
   keywords: [
-    "Shopiza",
+    APP_NAME,
     "ecommerce",
     "Next.js",
     "premium shopping",
@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-  authors: [{ name: "Shopiza" }],
-  creator: "Shopiza",
+  authors: [{ name: APP_NAME }],
+  creator: APP_NAME,
   category: "ecommerce",
 };
 

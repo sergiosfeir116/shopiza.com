@@ -12,8 +12,8 @@ import {
 
 const prisma = new PrismaClient();
 
-export const DEFAULT_ADMIN_PASSWORD = "ShopizaAdmin#2026!";
-const DEFAULT_CLIENT_PASSWORD = "ShopizaClient#2026!";
+export const DEFAULT_ADMIN_PASSWORD = "ShopizajAdmin#2026!";
+const DEFAULT_CLIENT_PASSWORD = "ShopizajClient#2026!";
 
 const sectionBlueprints = [
   {
@@ -120,7 +120,7 @@ async function main() {
 
   const admin = await prisma.user.create({
     data: {
-      fullName: "Shopiza Admin",
+      fullName: "Shopizaj Admin",
       username: "admin",
       usernameNormalized: normalizeUsername("admin"),
       email: "charbel.g.andraos@gmail.com",

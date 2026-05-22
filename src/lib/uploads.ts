@@ -41,7 +41,7 @@ function resolveProductUploadsDirectory() {
   }
 
   if (process.env.NODE_ENV === "production") {
-    return path.join(tmpdir(), "shopiza", "uploads", "products");
+    return path.join(tmpdir(), "shopizaj", "uploads", "products");
   }
 
   return legacyProductUploadsDirectory;

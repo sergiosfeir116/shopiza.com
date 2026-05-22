@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
-const ADMIN_ORDERS_SEEN_AT_KEY = "shopiza_admin_orders_seen_at";
+const ADMIN_ORDERS_SEEN_AT_KEY = "shopizaj_admin_orders_seen_at";
 const POLL_INTERVAL_MS = 30_000;
 
 const items = [
@@ -37,14 +37,12 @@ export function AdminNav() {
   useEffect(() => {
     if (isOrdersPath(pathname)) {
       writeSeenAt(new Date().toISOString());
-      setUnseenCount(0);
       return;
     }
 
     const seenAt = readSeenAt();
     if (!seenAt) {
       writeSeenAt(new Date().toISOString());
-      setUnseenCount(0);
       return;
     }
 
@@ -91,7 +89,10 @@ export function AdminNav() {
           item.href === "/admin"
             ? pathname === "/admin"
             : pathname === item.href || pathname.startsWith(`${item.href}/`);
-        const showOrdersBadge = item.href === "/admin/orders" && unseenCount > 0;
+        const showOrdersBadge =
+          item.href === "/admin/orders" &&
+          !isOrdersPath(pathname) &&
+          unseenCount > 0;
 
         return (
           <Link

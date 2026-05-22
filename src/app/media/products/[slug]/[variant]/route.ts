@@ -1,6 +1,8 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { APP_NAME } from "@/lib/constants";
+
 const palettes = [
   ["#0b1022", "#f447a1", "#7b4dff"],
   ["#131a35", "#ff77bf", "#7b4dff"],
@@ -385,7 +387,7 @@ export async function GET(
         ${label}
       </text>
       <text x="180" y="1032" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="white" opacity="0.66">
-        Shopiza premium catalog image ${variant}
+        ${APP_NAME} premium catalog image ${variant}
       </text>
     </svg>
   `;

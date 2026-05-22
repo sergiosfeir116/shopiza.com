@@ -1,13 +1,13 @@
 import Link from "next/link";
 
-import { ShopizaLogo } from "@/components/brand/shopiza-logo";
+import { ShopizajLogo } from "@/components/brand/shopizaj-logo";
 
 export function SiteFooter({ supportEmail }: { supportEmail: string }) {
   return (
     <footer className="mt-16 border-t border-[rgba(19,24,47,0.08)] bg-white/70">
       <div className="container-shell grid gap-10 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
         <div className="space-y-4">
-          <ShopizaLogo />
+          <ShopizajLogo />
         </div>
         <div>
           <h3 className="display-title text-lg font-semibold text-[var(--navy-950)]">

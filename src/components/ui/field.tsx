@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-const fieldClasses =
+export const fieldClasses =
   "w-full rounded-2xl border border-[var(--line-soft)] bg-white px-4 py-3 text-sm text-[var(--navy-950)] shadow-[0_8px_18px_rgba(17,24,39,0.04)] outline-none placeholder:text-[var(--ink-500)] focus:border-[rgba(244,71,161,0.48)] focus:ring-4 focus:ring-[rgba(244,71,161,0.12)]";
 
 export function TextField(

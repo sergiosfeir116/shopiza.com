@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { ShopizaLogo } from "@/components/brand/shopiza-logo";
+import { ShopizajLogo } from "@/components/brand/shopizaj-logo";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -36,11 +36,8 @@ export function MobileHeaderMenu({
   user,
 }: MobileHeaderMenuProps) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+  const [openPathname, setOpenPathname] = useState<string | null>(null);
+  const isOpen = openPathname === pathname;
 
   useEffect(() => {
     if (!isOpen) {
@@ -61,7 +58,9 @@ export function MobileHeaderMenu({
         type="button"
         aria-expanded={isOpen}
         aria-label={isOpen ? "Close menu" : "Open menu"}
-        onClick={() => setIsOpen((value) => !value)}
+        onClick={() =>
+          setOpenPathname((value) => (value === pathname ? null : pathname))
+        }
         className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--line-soft)] bg-white text-[var(--navy-950)] shadow-[0_10px_20px_rgba(18,26,56,0.05)]"
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -72,16 +71,16 @@ export function MobileHeaderMenu({
           <button
             type="button"
             aria-label="Close menu overlay"
-            onClick={() => setIsOpen(false)}
+            onClick={() => setOpenPathname(null)}
             className="fixed inset-0 z-40 bg-[rgba(18,26,56,0.16)] backdrop-blur-sm"
           />
           <div className="fixed inset-x-4 top-20 z-50 glass-card rounded-[28px] p-5 shadow-[0_18px_45px_rgba(18,26,56,0.16)]">
             <div className="flex items-start justify-between gap-4">
-              <ShopizaLogo href={homeHref} />
+              <ShopizajLogo href={homeHref} />
               <button
                 type="button"
                 aria-label="Close menu"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setOpenPathname(null)}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--line-soft)] bg-white text-[var(--navy-950)]"
               >
                 <X className="h-4 w-4" />
@@ -102,7 +101,7 @@ export function MobileHeaderMenu({
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => setOpenPathname(null)}
                     className={cn(
                       "rounded-2xl px-4 py-3 text-sm font-semibold transition",
                       isActive

@@ -1,5 +1,6 @@
 import { Package2, ClipboardList, Layers3, Tags } from "lucide-react";
 
+import { APP_NAME } from "@/lib/constants";
 import { getAdminDashboardSnapshot } from "@/lib/services/catalog";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
@@ -21,7 +22,7 @@ export default async function AdminOverviewPage() {
           Overview
         </p>
         <h1 className="mt-3 display-title text-4xl font-semibold text-[var(--navy-950)]">
-          Shopiza admin
+          {APP_NAME} admin
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
           Review core storefront activity, recent orders, and catalog coverage at a glance.

@@ -1,6 +1,6 @@
 import { type CurrentUser } from "@/lib/auth/current-user";
 import { CartIconLink } from "@/components/store/cart-icon-link";
-import { ShopizaLogo } from "@/components/brand/shopiza-logo";
+import { ShopizajLogo } from "@/components/brand/shopizaj-logo";
 import { MobileHeaderMenu } from "@/components/layout/mobile-header-menu";
 import { NavLink } from "@/components/layout/nav-link";
 import { ButtonLink } from "@/components/ui/button";
@@ -25,7 +25,7 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
       <header className="sticky top-0 z-40 border-b border-white/50 bg-[rgba(245,247,251,0.72)] backdrop-blur-xl">
         <div className="container-shell grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4">
           <div className="flex items-center">
-            <ShopizaLogo href="/admin" />
+            <ShopizajLogo href="/admin" />
           </div>
 
           <nav className="hidden items-center justify-center gap-6 text-sm font-medium text-[var(--ink-700)] md:flex">
@@ -68,7 +68,7 @@ export function SiteHeader({ user }: { user: CurrentUser }) {
     <header className="sticky top-0 z-40 border-b border-white/50 bg-[rgba(245,247,251,0.72)] backdrop-blur-xl">
       <div className="container-shell flex items-center justify-between gap-6 py-4">
         <div className="flex items-center gap-8">
-          <ShopizaLogo />
+          <ShopizajLogo />
           <nav className="hidden items-center gap-6 text-sm font-medium text-[var(--ink-700)] md:flex">
             <NavLink href="/" exact>
               Home

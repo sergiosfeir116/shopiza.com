@@ -39,7 +39,7 @@ export default async function AdminProductsPage({
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex-1">
-          <AdminLiveSearch defaultValue={searchQuery} />
+          <AdminLiveSearch key={searchQuery} defaultValue={searchQuery} />
         </div>
         <ButtonLink href="/admin/products/new">Add product</ButtonLink>
       </div>

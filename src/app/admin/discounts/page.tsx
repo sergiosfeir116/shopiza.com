@@ -39,7 +39,7 @@ export default async function AdminDiscountsPage({
 
       <div className="flex flex-col gap-4 min-[600px]:flex-row min-[600px]:items-end">
         <div className="flex-1">
-          <AdminLiveSearch defaultValue={searchQuery} />
+          <AdminLiveSearch key={searchQuery} defaultValue={searchQuery} />
         </div>
         <ButtonLink href="/admin/discounts/new">Add discount</ButtonLink>
       </div>

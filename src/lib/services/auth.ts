@@ -10,6 +10,7 @@ import { logSecurityEvent } from "@/lib/security/logger";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/services/mail";
 import {
+  APP_NAME,
   PASSWORD_RESET_TTL_MINUTES,
   PENDING_REGISTRATION_TTL_MINUTES,
   VERIFICATION_CODE_TTL_MINUTES,
@@ -326,9 +327,9 @@ async function deliverVerificationCode(
 ) {
   await sendMail({
     to: target.email,
-    subject: "Shopiza email verification code",
-    html: `<p>Your Shopiza email verification code is <strong>${code}</strong>. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.</p>`,
-    text: `Your Shopiza email verification code is ${code}. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
+    subject: `${APP_NAME} email verification code`,
+    html: `<p>Your ${APP_NAME} email verification code is <strong>${code}</strong>. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.</p>`,
+    text: `Your ${APP_NAME} email verification code is ${code}. It expires in ${VERIFICATION_CODE_TTL_MINUTES} minutes.`,
   });
 }
 
@@ -338,9 +339,9 @@ async function deliverPasswordResetCode(
 ) {
   await sendMail({
     to: user.email,
-    subject: "Shopiza password reset code",
-    html: `<p>Your Shopiza password reset code is <strong>${code}</strong>. It expires in ${PASSWORD_RESET_TTL_MINUTES} minutes.</p>`,
-    text: `Your Shopiza password reset code is ${code}. It expires in ${PASSWORD_RESET_TTL_MINUTES} minutes.`,
+    subject: `${APP_NAME} password reset code`,
+    html: `<p>Your ${APP_NAME} password reset code is <strong>${code}</strong>. It expires in ${PASSWORD_RESET_TTL_MINUTES} minutes.</p>`,
+    text: `Your ${APP_NAME} password reset code is ${code}. It expires in ${PASSWORD_RESET_TTL_MINUTES} minutes.`,
   });
 }
 

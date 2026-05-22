@@ -1,6 +1,6 @@
-# Shopiza
+# Shopizaj
 
-Shopiza is a full-stack premium ecommerce web application built with Next.js App Router, TypeScript, Prisma, and SQLite for local development.
+Shopizaj is a full-stack premium ecommerce web application built with Next.js App Router, TypeScript, Prisma, and SQLite for local development.
 
 It includes:
 
@@ -29,7 +29,7 @@ It includes:
 - The seeded admin account is intended for development/bootstrap only.
 - Product images in seed data are generated through an internal media route.
 - Uploaded admin product images keep the `/uploads/products/...` URL shape, but are served through a route handler. Local development stores them in `public/uploads/products`; production can point `PRODUCT_UPLOADS_DIR` at any writable directory.
-- The workspace did not contain an actual Shopiza logo asset file, so the app uses a branded text/mark lockup matched to the requested dark navy, magenta, and purple palette.
+- The workspace did not contain an actual Shopizaj logo asset file, so the app uses a branded text/mark lockup matched to the requested dark navy, magenta, and purple palette.
 
 ## Local Setup
 
@@ -78,11 +78,11 @@ Required/used variables:
 ```env
 DATABASE_URL="file:./dev.db"
 SESSION_SECRET="replace-with-a-long-random-secret"
-SHOPIZA_SUPPORT_EMAIL="charbel.g.andraos@gmail.com"
-SHOPIZA_APP_URL="http://localhost:3000"
+SHOPIZAJ_SUPPORT_EMAIL="charbel.g.andraos@gmail.com"
+SHOPIZAJ_APP_URL="http://localhost:3000"
 PRODUCT_UPLOADS_DIR=""
 RESEND_API_KEY=""
-FROM_EMAIL="Shopiza <onboarding@resend.dev>"
+FROM_EMAIL="Shopizaj <onboarding@resend.dev>"
 TEST_NOTIFICATION_MODE="capture"
 EMAIL_NOTIFICATION_MODE="live"
 TEST_NOTIFICATION_EMAIL=""
@@ -106,12 +106,12 @@ Default admin account:
 
 - Username: `admin`
 - Email: `charbel.g.andraos@gmail.com`
-- Password: `ShopizaAdmin#2026!`
+- Password: `ShopizajAdmin#2026!`
 - Role: `ADMIN`
 
 Seeded sample client password:
 
-- Password: `ShopizaClient#2026!`
+- Password: `ShopizajClient#2026!`
 
 ## Auth and Verification
 

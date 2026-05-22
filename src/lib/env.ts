@@ -20,10 +20,10 @@ function requiredInProduction(value: string | undefined, fallback: string) {
 }
 
 export const env = {
-  appUrl: process.env.SHOPIZA_APP_URL ?? "http://localhost:3000",
+  appUrl: process.env.SHOPIZAJ_APP_URL ?? "http://localhost:3000",
   sessionSecret: requiredInProduction(
     process.env.SESSION_SECRET,
-    "shopiza-dev-session-secret-change-me",
+    "shopizaj-dev-session-secret-change-me",
   ),
   email: {
     resendApiKey: process.env.RESEND_API_KEY ?? "",

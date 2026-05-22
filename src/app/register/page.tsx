@@ -1,5 +1,6 @@
 import { RegisterForm } from "@/components/forms/register-form";
 import { redirectAdminHome } from "@/lib/auth/current-user";
+import { APP_NAME } from "@/lib/constants";
 
 export default async function RegisterPage() {
   await redirectAdminHome();
@@ -11,7 +12,7 @@ export default async function RegisterPage() {
           Create account
         </p>
         <h1 className="mt-3 display-title text-4xl font-semibold text-[var(--navy-950)]">
-          Join Shopiza as a client
+          Join {APP_NAME} as a client
         </h1>
         <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
           New accounts start as clients by default and are only created after email verification. Delivery location is chosen separately for each order during checkout.

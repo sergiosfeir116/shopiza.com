@@ -1,6 +1,6 @@
 import "server-only";
 
-import { SUPPORT_EMAIL } from "@/lib/constants";
+import { APP_NAME, SUPPORT_EMAIL } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/services/mail";
 
@@ -21,7 +21,7 @@ export async function createContactMessage(input: {
 
   await sendMail({
     to: SUPPORT_EMAIL,
-    subject: "New Shopiza contact message",
+    subject: `New ${APP_NAME} contact message`,
     html: `
       <h1>New contact message</h1>
       <p><strong>Name:</strong> ${input.name}</p>

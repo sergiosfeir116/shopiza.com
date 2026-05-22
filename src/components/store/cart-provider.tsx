@@ -54,6 +54,7 @@ const emptyCart: CartState = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
+const CART_SESSION_KEY = "shopizaj_cart_session";
 
 async function readJson<T>(response: Response) {
   const payload = (await response.json()) as T & { message?: string };
@@ -65,13 +66,13 @@ async function readJson<T>(response: Response) {
 }
 
 function ensureSessionId() {
-  const existing = localStorage.getItem("shopiza_cart_session");
+  const existing = localStorage.getItem(CART_SESSION_KEY);
   if (existing) {
     return existing;
   }
 
   const created = crypto.randomUUID();
-  localStorage.setItem("shopiza_cart_session", created);
+  localStorage.setItem(CART_SESSION_KEY, created);
   return created;
 }
 

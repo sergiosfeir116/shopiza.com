@@ -21,7 +21,7 @@ describe("utils", () => {
   });
 
   it("removes control characters from text input", () => {
-    expect(sanitizeText("Hello\u0000 Shopiza")).toBe("Hello Shopiza");
+    expect(sanitizeText("Hello\u0000 Shopizaj")).toBe("Hello Shopizaj");
   });
 
   it("finds the next available slug suffix", () => {
