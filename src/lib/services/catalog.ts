@@ -192,7 +192,6 @@ export async function getAdminDashboardSnapshot() {
           select: {
             fullName: true,
             email: true,
-            phoneNumber: true,
           },
         },
       },

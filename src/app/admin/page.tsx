@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Package2, ClipboardList, Layers3, Tags } from "lucide-react";
 
 import { APP_NAME } from "@/lib/constants";
@@ -53,12 +52,8 @@ export default async function AdminOverviewPage() {
         </h2>
         <div className="mt-6 grid gap-4">
           {recentOrders.map((order) => (
-            <Link
-              key={order.id}
-              href={`/admin/orders/${order.id}`}
-              className="rounded-[24px] border border-[var(--line-soft)] bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-[0_18px_45px_rgba(18,26,56,0.12)]"
-            >
-              <article className="flex flex-wrap items-start justify-between gap-4">
+            <article key={order.id} className="rounded-[24px] border border-[var(--line-soft)] bg-white p-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[var(--pink-500)]">
                     {order.orderNumber}
@@ -67,9 +62,6 @@ export default async function AdminOverviewPage() {
                     {order.clientName}
                   </h3>
                   <p className="mt-2 text-sm text-[var(--ink-700)]">
-                    {order.clientPhoneNumber}
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink-700)]">
                     {order.destinationLocation}
                   </p>
                   <p className="mt-2 text-sm text-[var(--ink-500)]">
@@ -79,8 +71,8 @@ export default async function AdminOverviewPage() {
                 <p className="text-xl font-semibold text-[var(--navy-950)]">
                   {formatCurrency(order.totalPriceCents)}
                 </p>
-              </article>
-            </Link>
+              </div>
+            </article>
           ))}
         </div>
       </div>

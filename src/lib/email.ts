@@ -4,7 +4,7 @@ import { type OrderStatus, type PaymentMethod } from "@prisma/client";
 
 import { APP_NAME, ORDER_STATUS_LABELS, SUPPORT_EMAIL } from "@/lib/constants";
 import { sendMail } from "@/lib/services/mail";
-import { formatCurrency } from "@/lib/utils";
+import { buildGoogleMapsUrl, formatCurrency } from "@/lib/utils";
 
 type EmailOrderItem = {
   productName: string;
@@ -189,9 +189,14 @@ function buildSummaryText(rows: EmailSectionRow[]) {
 }
 
 export async function sendOrderConfirmationEmail(order: OrderEmailPayload) {
+  const mapsUrl = buildGoogleMapsUrl({
+    locationLabel: order.destinationLocation,
+    latitude: order.destinationLatitude,
+    longitude: order.destinationLongitude,
+    placeId: order.destinationPlaceId,
+  });
   const summaryRows: EmailSectionRow[] = [
     { label: "Customer", value: order.customerName },
-    { label: "Phone number", value: order.customerPhoneNumber },
     { label: "Order ID", value: order.orderNumber },
     { label: "Delivery location", value: order.destinationLocation },
     { label: "Payment method", value: getPaymentMethodLabel(order.paymentMethod) },
@@ -214,9 +219,12 @@ export async function sendOrderConfirmationEmail(order: OrderEmailPayload) {
         <p style="margin: 0 0 8px; color: ${BRAND.heading}; font-size: 15px; font-weight: 700;">
           Delivery location
         </p>
-        <p style="margin: 0; color: ${BRAND.text}; font-size: 14px; line-height: 1.7;">
+        <p style="margin: 0 0 12px; color: ${BRAND.text}; font-size: 14px; line-height: 1.7;">
           ${escapeHtml(order.destinationLocation)}
         </p>
+        <a href="${escapeHtml(mapsUrl)}" style="color: ${BRAND.accent}; font-size: 14px; font-weight: 700; text-decoration: none;">
+          Open in Google Maps
+        </a>
       </div>
       <div style="padding: 18px 20px; border-radius: 20px; background: rgba(244, 71, 161, 0.07); color: ${BRAND.heading}; font-size: 14px; line-height: 1.7;">
         We appreciate your order and will reach out soon to arrange your cash on delivery handoff.
@@ -230,6 +238,7 @@ export async function sendOrderConfirmationEmail(order: OrderEmailPayload) {
     "We received your order successfully. Our store will contact you soon.",
     "",
     ...buildSummaryText(summaryRows),
+    `Google Maps: ${mapsUrl}`,
     "",
     "Ordered products:",
     ...buildOrderItemsText(order.items),
@@ -244,6 +253,12 @@ export async function sendOrderConfirmationEmail(order: OrderEmailPayload) {
 }
 
 export async function sendAdminOrderNotificationEmail(order: OrderEmailPayload) {
+  const mapsUrl = buildGoogleMapsUrl({
+    locationLabel: order.destinationLocation,
+    latitude: order.destinationLatitude,
+    longitude: order.destinationLongitude,
+    placeId: order.destinationPlaceId,
+  });
   const summaryRows: EmailSectionRow[] = [
     { label: "Customer", value: order.customerName },
     { label: "Customer email", value: order.customerEmail },
@@ -271,9 +286,12 @@ export async function sendAdminOrderNotificationEmail(order: OrderEmailPayload) 
         <p style="margin: 0 0 8px; color: ${BRAND.heading}; font-size: 15px; font-weight: 700;">
           Delivery location
         </p>
-        <p style="margin: 0; color: ${BRAND.text}; font-size: 14px; line-height: 1.7;">
+        <p style="margin: 0 0 12px; color: ${BRAND.text}; font-size: 14px; line-height: 1.7;">
           ${escapeHtml(order.destinationLocation)}
         </p>
+        <a href="${escapeHtml(mapsUrl)}" style="color: ${BRAND.accent}; font-size: 14px; font-weight: 700; text-decoration: none;">
+          Open in Google Maps
+        </a>
       </div>
     `,
   });
@@ -287,6 +305,7 @@ export async function sendAdminOrderNotificationEmail(order: OrderEmailPayload) 
     `Delivery location: ${order.destinationLocation}`,
     `Payment method: ${getPaymentMethodLabel(order.paymentMethod)}`,
     `Total: ${formatCurrency(order.totalPriceCents)}`,
+    `Google Maps: ${mapsUrl}`,
     "",
     "Ordered products:",
     ...buildOrderItemsText(order.items),

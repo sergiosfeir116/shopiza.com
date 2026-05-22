@@ -5,12 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useCart } from "@/components/store/cart-provider";
-import {
-  buildLocationLabel,
-  isLocationComplete,
-  LocationPicker,
-  type LocationValue,
-} from "@/components/store/location-picker";
+import { LocationPicker, requestCurrentLocationValue } from "@/components/store/location-picker";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 
@@ -21,11 +16,11 @@ export function CheckoutForm({
 }) {
   const router = useRouter();
   const { cart, sessionId, clearCart } = useCart();
-  const [location, setLocation] = useState<LocationValue>({
-    city: "",
-    district: "",
-    street: "",
-    buildingNumber: "",
+  const [location, setLocation] = useState({
+    label: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
+    placeId: null as string | null,
   });
   const [pending, setPending] = useState(false);
 
@@ -38,6 +33,11 @@ export function CheckoutForm({
         <h1 className="mt-3 display-title text-3xl font-semibold text-[var(--navy-950)]">
           Checkout for {userName}
         </h1>
+        <p className="mt-3 text-sm leading-7 text-[var(--ink-700)]">
+          Cash on delivery only. If no delivery point is selected yet, we request
+          your current location before submitting the order. You can also use the
+          button below to grant location access and load it in advance.
+        </p>
         <div className="mt-8">
           <LocationPicker value={location} onChange={setLocation} />
         </div>
@@ -52,24 +52,32 @@ export function CheckoutForm({
             }
 
             setPending(true);
-            if (!isLocationComplete(location)) {
-              toast.error(
-                "Enter city, district, street, and building number before submitting.",
-              );
-              setPending(false);
-              return;
+            let orderLocation = location;
+
+            if (!orderLocation.label) {
+              try {
+                orderLocation = await requestCurrentLocationValue();
+                setLocation(orderLocation);
+              } catch (error) {
+                toast.error(
+                  error instanceof Error
+                    ? error.message
+                    : "Choose a destination location before submitting.",
+                );
+                setPending(false);
+                return;
+              }
             }
-            const destinationLocation = buildLocationLabel(location);
 
             const response = await fetch("/api/orders", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 cartSessionId: sessionId,
-                destinationLocation,
-                destinationLatitude: null,
-                destinationLongitude: null,
-                destinationPlaceId: null,
+                destinationLocation: orderLocation.label,
+                destinationLatitude: orderLocation.latitude,
+                destinationLongitude: orderLocation.longitude,
+                destinationPlaceId: orderLocation.placeId,
               }),
             });
 
