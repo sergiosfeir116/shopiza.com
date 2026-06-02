@@ -4,19 +4,11 @@ import { randomUUID } from "node:crypto";
 import { readFile, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import sharp from "sharp";
 
-import {
-  ALLOWED_PRODUCT_IMAGE_TYPES,
-  MAX_PRODUCT_IMAGE_BYTES,
-} from "@/lib/constants";
+import { MAX_PRODUCT_IMAGE_BYTES } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
-const extensionByMimeType: Record<(typeof ALLOWED_PRODUCT_IMAGE_TYPES)[number], string> =
-  {
-    "image/jpeg": ".jpg",
-    "image/png": ".png",
-    "image/webp": ".webp",
-  };
 const contentTypeByExtension = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
@@ -153,6 +145,29 @@ function getProductImageFilenameFromUrl(imageUrl: string) {
   return productImageFilenamePattern.test(filename) ? filename : null;
 }
 
+async function normalizeProductImage(file: File) {
+  const inputBuffer = Buffer.from(await file.arrayBuffer());
+
+  try {
+    const output = await sharp(inputBuffer, {
+      failOnError: true,
+    })
+      .rotate()
+      .webp({ quality: 90 })
+      .toBuffer({ resolveWithObject: true });
+
+    return {
+      buffer: output.data,
+      contentType: "image/webp" as const,
+      extension: ".webp" as const,
+    };
+  } catch {
+    throw new Error(
+      "Unsupported image file. Please upload a common photo format like JPG, PNG, WebP, AVIF, GIF, BMP, or TIFF.",
+    );
+  }
+}
+
 export async function readStoredProductImage(filename: string) {
   if (!productImageFilenamePattern.test(filename)) {
     return null;
@@ -198,18 +213,13 @@ export async function readStoredProductImage(filename: string) {
 }
 
 export async function saveProductImage(file: File, uploadedByUserId: string) {
-  if (!ALLOWED_PRODUCT_IMAGE_TYPES.includes(file.type as never)) {
-    throw new Error("Unsupported file type. Please upload JPG, PNG, or WebP.");
-  }
-
   if (file.size > MAX_PRODUCT_IMAGE_BYTES) {
     throw new Error("Image size exceeds the 4MB limit.");
   }
 
-  const extension = extensionByMimeType[file.type as keyof typeof extensionByMimeType];
-  const filename = `${randomUUID()}${extension}`;
+  const normalizedImage = await normalizeProductImage(file);
+  const filename = `${randomUUID()}${normalizedImage.extension}`;
   const id = randomUUID();
-  const buffer = Buffer.from(await file.arrayBuffer());
   const imageUrl = buildProductImageUrl(filename);
 
   await ensureUploadedProductImageStorage();
@@ -227,8 +237,8 @@ export async function saveProductImage(file: File, uploadedByUserId: string) {
       ${id},
       ${uploadedByUserId},
       ${imageUrl},
-      ${file.type},
-      ${buffer},
+      ${normalizedImage.contentType},
+      ${normalizedImage.buffer},
       ${new Date()}
     )
   `;

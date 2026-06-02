@@ -71,6 +71,7 @@ function buildPendingRegistration(
   overrides: Partial<PendingRegistration> = {},
 ): PendingRegistration {
   const now = new Date("2026-05-21T10:00:00.000Z");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   return {
     id: "pending-1",
@@ -86,7 +87,7 @@ function buildPendingRegistration(
     locationLabel: null,
     locationLatitude: null,
     locationLongitude: null,
-    expiresAt: new Date("2026-05-22T10:00:00.000Z"),
+    expiresAt,
     createdAt: now,
     updatedAt: now,
     ...overrides,

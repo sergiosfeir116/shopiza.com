@@ -239,7 +239,7 @@ export function ProductEditor({ product, sections }: ProductEditorProps) {
           <input
             type="file"
             multiple
-            accept="image/png,image/jpeg,image/webp"
+            accept="image/*"
             disabled={pending || isUploadingImages}
             onChange={(event) => {
               void handleImageUpload(event);
