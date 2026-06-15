@@ -27,15 +27,11 @@ export default async function ProductsPage({
     <div className="container-shell space-y-10 py-12">
       <div className="glass-card rounded-[36px] p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--pink-500)]">
-          Shop catalog
+          Shop
         </p>
         <h1 className="mt-3 display-title text-4xl font-semibold text-[var(--navy-950)]">
-          Browse curated products
+          Browse
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--ink-700)]">
-          Search across premium essentials, filter by section, and explore
-          products with clean pricing, stock visibility, and real-time discounts.
-        </p>
         <ProductsFilters
           initialQuery={params.q}
           initialSection={params.section}
